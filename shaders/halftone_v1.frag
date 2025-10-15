@@ -4,15 +4,15 @@
 precision mediump float;
 #endif
 
-uniform sampler2D u_image;
 uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform float u_time;
+uniform sampler2D u_tex0;
 uniform float u_cellSize;
 uniform float u_angleC;
 uniform float u_angleM;
 uniform float u_angleY;
 uniform float u_angleK;
-
-varying vec2 v_texCoord;
 
 // RGB 轉 CMYK
 vec4 rgb2cmyk(vec3 rgb) {
@@ -55,9 +55,9 @@ void main() {
 
     // 取得螢幕座標並正規化到 [0,1]
     vec2 st = gl_FragCoord.xy / u_resolution.xy; // 螢幕座標除以解析度，得到正規化座標
-
+    
     // 以 st 作為紋理取樣座標
-    vec3 rgb = texture2D(u_image, st).rgb; // 取樣原始圖片的 RGB 顏色
+    vec3 rgb = texture2D(u_tex0, st).rgb; // 取樣原始圖片的 RGB 顏色
 
     // 將 RGB 轉換為 CMYK 四通道
     vec4 cmyk = rgb2cmyk(rgb); // 取得 C、M、Y、K 四個通道值
@@ -81,6 +81,9 @@ void main() {
     result -= dotY * yColor * cmyk.b; // 疊加黃色
     result -= dotK * kColor * cmyk.a; // 疊加黑色
 
+    // DEBUG: 如果完全看不到任何東西，先註解下面這行來測試 shader 是否正在運作
+    //result = vec3(1.0, 0.0, 0.0); // 純紅色測試
+    
     result = clamp(result, 0.0, 1.0); // 限制顏色在合法範圍
     gl_FragColor = vec4(result, 1.0); // 輸出最終顏色
 }
