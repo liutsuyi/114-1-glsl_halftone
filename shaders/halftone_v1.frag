@@ -51,16 +51,16 @@ float halftoneDot(float channel, vec2 uv, float cellSize, float angle) {
 }
 
 void main() {
-
-
     // 取得螢幕座標並正規化到 [0,1]
-    vec2 st = gl_FragCoord.xy / u_resolution.xy; // 螢幕座標除以解析度，得到正規化座標
+    vec2 st = gl_FragCoord.xy / u_resolution.xy;
     
-    // 以 st 作為紋理取樣座標
-    vec3 rgb = texture2D(u_tex0, st).rgb; // 取樣原始圖片的 RGB 顏色
-
+    // DEBUG 測試 1: 直接顯示原始圖片
+    vec3 rgb = texture2D(u_tex0, st).rgb;
+    gl_FragColor = vec4(rgb, 1.0);
+    return; // 暫時在這裡結束，測試圖片讀取
+    
     // 將 RGB 轉換為 CMYK 四通道
-    vec4 cmyk = rgb2cmyk(rgb); // 取得 C、M、Y、K 四個通道值
+    vec4 cmyk = rgb2cmyk(rgb);
 
     // 計算每個通道的半調網點（各自旋轉角度）
     float dotC = halftoneDot(cmyk.r, st, u_cellSize, u_angleC); // 青色網點
